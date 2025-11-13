@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export default function Registrasi() {
+export default function RegisterAdmin() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -14,28 +14,29 @@ export default function Registrasi() {
 
   const [loading, setLoading] = useState(false);
 
+  // ✅ Handle perubahan input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 🔥 FUNGSI INI AKAN MENGIRIM DATA KE BACKEND (RenovaAPI)
+  // ✅ Fungsi kirim data ke backend RenovaAPI (auto insert ke user & admin)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch("http://localhost:5000/api/admins", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        // ⬇️ kirim hanya field yang dibutuhkan, id_user & status dihandle backend
         body: JSON.stringify({
           Nama_Lengkap: formData.namaLengkap,
           email: formData.email,
           password: formData.password,
           alamat: formData.alamat,
           no_telp: formData.noTelp,
-          id_role: 2, // contoh: 2 = user biasa
         }),
       });
 
@@ -43,14 +44,14 @@ export default function Registrasi() {
       console.log("✅ Response dari backend:", data);
 
       if (response.ok) {
-        alert("Registrasi berhasil!");
-        navigate("/login");
+        alert("✅ Admin baru berhasil didaftarkan!");
+        navigate("/admin/dashboard");
       } else {
-        alert(data.message || "Registrasi gagal");
+        alert(data.message || "Gagal mendaftarkan admin.");
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      alert("Gagal terhubung ke server. Pastikan backend jalan di port 5000");
+      alert("Gagal terhubung ke server. Pastikan backend RenovaAPI aktif di port 5000.");
     } finally {
       setLoading(false);
     }
@@ -66,26 +67,26 @@ export default function Registrasi() {
           font-family: "Poppins", sans-serif;
         }
 
-        .register-container {
+        .register-admin-container {
           display: flex;
           justify-content: center;
           align-items: center;
           min-height: 100vh;
-          background: linear-gradient(135deg, #0044cc, #0066ff);
+          background: linear-gradient(135deg, #b30000, #ff3333);
         }
 
-        .register-card {
+        .register-admin-card {
           background-color: #fff;
           border-radius: 15px;
           padding: 40px 50px;
           width: 400px;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.15);
           text-align: center;
         }
 
-        .register-card h2 {
+        .register-admin-card h2 {
           margin-bottom: 25px;
-          color: #0044cc;
+          color: #b30000;
         }
 
         .form-group {
@@ -100,7 +101,7 @@ export default function Registrasi() {
           color: #333;
         }
 
-        .form-group input, 
+        .form-group input,
         .form-group textarea {
           width: 100%;
           padding: 10px 12px;
@@ -113,12 +114,12 @@ export default function Registrasi() {
 
         .form-group input:focus,
         .form-group textarea:focus {
-          border-color: #0044cc;
-          box-shadow: 0 0 4px rgba(0, 68, 204, 0.3);
+          border-color: #b30000;
+          box-shadow: 0 0 4px rgba(204, 0, 0, 0.3);
         }
 
-        .btn-register {
-          background-color: #0044cc;
+        .btn-register-admin {
+          background-color: #b30000;
           color: white;
           border: none;
           padding: 12px;
@@ -130,8 +131,8 @@ export default function Registrasi() {
           width: 100%;
         }
 
-        .btn-register:hover {
-          background-color: #003399;
+        .btn-register-admin:hover {
+          background-color: #990000;
         }
 
         .login-link {
@@ -141,7 +142,7 @@ export default function Registrasi() {
         }
 
         .login-link span {
-          color: #0044cc;
+          color: #b30000;
           cursor: pointer;
           font-weight: 500;
         }
@@ -151,9 +152,9 @@ export default function Registrasi() {
         }
       `}</style>
 
-      <div className="register-container">
-        <div className="register-card">
-          <h2>Daftar Akun Renova</h2>
+      <div className="register-admin-container">
+        <div className="register-admin-card">
+          <h2>Registrasi Admin Baru</h2>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -161,7 +162,7 @@ export default function Registrasi() {
               <input
                 type="text"
                 name="namaLengkap"
-                placeholder="Masukkan nama lengkap"
+                placeholder="Masukkan nama lengkap admin"
                 value={formData.namaLengkap}
                 onChange={handleChange}
                 required
@@ -173,7 +174,7 @@ export default function Registrasi() {
               <input
                 type="email"
                 name="email"
-                placeholder="Masukkan email"
+                placeholder="Masukkan email admin"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -216,14 +217,18 @@ export default function Registrasi() {
               />
             </div>
 
-            <button type="submit" className="btn-register" disabled={loading}>
-              {loading ? "Mengirim..." : "Daftar Sekarang"}
+            <button
+              type="submit"
+              className="btn-register-admin"
+              disabled={loading}
+            >
+              {loading ? "Mengirim..." : "Daftarkan Admin"}
             </button>
           </form>
 
           <p className="login-link">
-            Sudah punya akun?{" "}
-            <span onClick={() => navigate("/login")}>Masuk di sini</span>
+            Kembali ke{" "}
+            <span onClick={() => navigate("/admin/dashboard")}>Dashboard</span>
           </p>
         </div>
       </div>
