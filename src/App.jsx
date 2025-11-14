@@ -7,6 +7,8 @@ import DashboardAdmin from "./admin/DashboardAdmin.jsx";
 import RegisterAdmin from "./Pages/RegisterAdmin.jsx";
 import UserManagement from "./admin/userManagement.jsx";
 import OrderManagement from "./admin/orderManagement.jsx";
+import ProgramKerja from "./admin/jadwalKerja.jsx";
+import JanjiView from "./admin/janjiView.jsx";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
       <Route path = "/admin/dashboard" element={<DashboardAdmin/>} />
       <Route path = "/admin/userManager" element={<UserManagement/>} />
       <Route path = "/admin/orderManegement" element={<OrderManagement/>} />
+      <Route path = "/admin/jadwalKerja" element={<ProgramKerja/>} />
+      <Route path = "/admin/JanjiView" element={<JanjiView/>} />
 
 
     </Routes>

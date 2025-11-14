@@ -238,61 +238,82 @@ const UserManagement = () => {
           flexDirection: 'column',
           gap: '4px'
         }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              color: '#9CA3AF',
-              cursor: 'pointer'
-            }}
-            onClick={() => navigate('/admin/dashboard')} // <-- Bisa kembali ke dashboard
-          >
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
-          </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            backgroundColor: '#7C3AED',
-            color: 'white',
-            cursor: 'pointer',
-            boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
-          }}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>User Management</span>
-          </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            color: '#9CA3AF',
-            cursor: 'pointer'
-          }}
-          onClick={() => navigate('/admin/orderManegement')}
-          >
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Order Management</span>
-          </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            color: '#9CA3AF',
-            cursor: 'pointer'
-          }}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Admin's Keys</span>
-          </div>
+           <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        color: 'white',
+                        cursor: 'pointer',
+                        boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
+                      }}
+                      onClick={() => navigate('/admin/dashboard')}
+                    >
+                      <span style={{ fontSize: '16px' }}>●</span>
+                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 12px',
+                        backgroundColor: '#7C3AED',
+                        borderRadius: '8px',
+                        color: '#9CA3AF',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => navigate('/admin/userManager')}   // <-- pindah ke User Management
+                    >
+                      <span style={{ fontSize: '16px' }}>●</span>
+                      <span style={{ fontSize: '14px', fontWeight: '500' }}>User Management</span>
+                    </div>
+                   <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        color: '#9CA3AF',
+                        cursor: 'pointer',
+                        boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
+                      }}
+                      onClick={() => navigate('/admin/orderManegement')}   // <-- pindah ke User Management
+                    >
+                      <span style={{ fontSize: '16px' }}>●</span>
+                      <span style={{ fontSize: '14px', fontWeight: '500' }}>order Management</span>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      color: '#9CA3AF',
+                      cursor: 'pointer',
+                      boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
+                    }}
+                    onClick={() => navigate('/admin/jadwalKerja')} >
+                      <span style={{ fontSize: '16px' }}>●</span>
+                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      color: '#9CA3AF',
+                      cursor: 'pointer',
+                      boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
+                    }}
+                    onClick={() => navigate('/admin/janjiView')} >
+                      <span style={{ fontSize: '16px' }}>●</span>
+                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Janji Konsultasi</span>
+                    </div>
         </nav>
 
         <div style={{ 

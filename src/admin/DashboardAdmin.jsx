@@ -94,7 +94,8 @@ const DashboardAdmin = () => {
               padding: '10px 12px',
               borderRadius: '8px',
               color: '#9CA3AF',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
             }}
             onClick={() => navigate('/admin/userManager')}   // <-- pindah ke User Management
           >
@@ -109,7 +110,8 @@ const DashboardAdmin = () => {
               padding: '10px 12px',
               borderRadius: '8px',
               color: '#9CA3AF',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
             }}
             onClick={() => navigate('/admin/orderManegement')}   // <-- pindah ke User Management
           >
@@ -123,11 +125,28 @@ const DashboardAdmin = () => {
             padding: '10px 12px',
             borderRadius: '8px',
             color: '#9CA3AF',
-            cursor: 'pointer'
-          }}>
+            cursor: 'pointer',
+            boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
+          }}
+          onClick={() => navigate('/admin/jadwalKerja')} >
             <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Admin's Keys</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
           </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '10px 12px',
+            borderRadius: '8px',
+            color: '#9CA3AF',
+            cursor: 'pointer',
+            boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
+          }}
+          onClick={() => navigate('/admin/janjiView')} >
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Janji Konsultasi</span>
+          </div>
+
         </nav>
 
         <div style={{ 
