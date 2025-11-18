@@ -5,19 +5,59 @@ const DashboardUser = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const [keperluan, setKeperluan] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
   useEffect(() => {
-    // Ambil data user dari localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
-      navigate("/login"); // jika belum login, kembali ke halaman login
+      navigate("/login");
     }
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const handleBuatJanji = async () => {
+    if (!keperluan.trim()) {
+      setMessage("Keperluan tidak boleh kosong!");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("http://localhost:5000/janji", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keperluan: keperluan,
+          id_user: user.id_user,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Janji berhasil dibuat!");
+        setKeperluan(""); // reset form
+      } else {
+        setMessage(data.message || "Gagal membuat janji");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("Terjadi kesalahan server");
+    }
+
+    setLoading(false);
   };
 
   const styles = {
@@ -62,6 +102,27 @@ const DashboardUser = () => {
       color: "#333",
       margin: "5px 0",
     },
+    input: {
+      width: "100%",
+      padding: "12px",
+      borderRadius: "8px",
+      border: "1px solid #ccc",
+      marginTop: "10px",
+      marginBottom: "20px",
+      fontSize: "15px",
+    },
+    btnJanji: {
+      padding: "10px 20px",
+      backgroundColor: "#0275d8",
+      color: "white",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontWeight: "600",
+      transition: "0.3s",
+      width: "100%",
+      marginBottom: "15px",
+    },
     logoutButton: {
       padding: "10px 20px",
       backgroundColor: "#d9534f",
@@ -71,18 +132,20 @@ const DashboardUser = () => {
       cursor: "pointer",
       fontWeight: "600",
       transition: "0.3s",
+      width: "100%",
     },
-    logoutButtonHover: {
-      backgroundColor: "#c9302c",
+    message: {
+      marginTop: "10px",
+      fontWeight: "600",
+      color: "green",
     },
   };
-
-  const [hoverLogout, setHoverLogout] = useState(false);
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <h1 style={styles.title}>Selamat Datang 👋</h1>
+
         {user ? (
           <>
             <p style={styles.subtitle}>
@@ -104,15 +167,26 @@ const DashboardUser = () => {
               </p>
             </div>
 
-            <button
-              style={{
-                ...styles.logoutButton,
-                ...(hoverLogout ? styles.logoutButtonHover : {}),
-              }}
-              onMouseEnter={() => setHoverLogout(true)}
-              onMouseLeave={() => setHoverLogout(false)}
-              onClick={handleLogout}
-            >
+            {/* FORM BUAT JANJI */}
+            <h3 style={{ marginBottom: "10px", color: "#0056b3" }}>
+              Buat Janji Baru
+            </h3>
+
+            <textarea
+              style={styles.input}
+              rows="3"
+              placeholder="Tuliskan keperluan janji..."
+              value={keperluan}
+              onChange={(e) => setKeperluan(e.target.value)}
+            ></textarea>
+
+            <button style={styles.btnJanji} onClick={handleBuatJanji} disabled={loading}>
+              {loading ? "Mengirim..." : "Buat Janji"}
+            </button>
+
+            {message && <p style={styles.message}>{message}</p>}
+
+            <button style={styles.logoutButton} onClick={handleLogout}>
               Keluar
             </button>
           </>

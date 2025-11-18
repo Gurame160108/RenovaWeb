@@ -144,9 +144,15 @@ export default function LandingPage() {
           text-align: center;
         }
 
+        .why1 {
+          background-color: #adc2fcff;
+          padding: 30px 100px;
+          text-align: center;
+        }
+
         .why h2 {
           font-size: 2rem;
-          margin-bottom: 40px;
+          margin-bottom: 50px;
         }
 
         .why-grid {
@@ -161,6 +167,20 @@ export default function LandingPage() {
           border-radius: 12px;
           padding: 30px;
           width: 260px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .why-grid1 {
+          display: flex;
+          justify-content: center;
+          gap: 50px;
+          flex-wrap: wrap;
+        }
+
+        .why-card1 {
+          background-color: #b5dfecff;
+          border-radius: 14px;
+          padding: 30px;
+          width: 270px;
           box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
@@ -249,6 +269,28 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+
+        {/* Why Section */}
+        <section id="why1" className="why1">
+        <div></div>
+          <h2>Mengapa Memilih Renova?</h2>
+          <div className="why-grid1">
+            <div className="why-card1">
+              <h4>✅ Profesional</h4>
+              <p>Tim berpengalaman dalam bidang konstruksi dan arsitektur.</p>
+            </div>
+            <div className="why-card1">
+              <h4>🏠 Hasil Berkualitas</h4>
+              <p>Setiap proyek kami jaga kualitas dan ketepatannya.</p>
+            </div>
+            <div className="why-card1">
+              <h4>💬 Konsultasi Gratis</h4>
+              <p>Dapatkan arahan dan solusi terbaik sebelum memulai proyekmu.</p>
+            </div>
+          </div>
+        </section>
+
 
         {/* Footer */}
         <footer>

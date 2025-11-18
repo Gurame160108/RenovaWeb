@@ -15,7 +15,9 @@ const Login = () => {
     }
 
     try {
-      // 🔹 Coba login sebagai admin
+      // =============================
+      // 🔥 1. Coba login sebagai admin
+      // =============================
       let response = await fetch("http://localhost:5000/api/admins/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -25,13 +27,31 @@ const Login = () => {
       let data = await response.json();
 
       if (response.ok && data.admin) {
-        console.log("Login admin berhasil:", data);
         localStorage.setItem("user", JSON.stringify(data.admin));
         navigate("/admin/dashboard");
         return;
       }
 
-      // 🔹 Jika gagal, coba login sebagai user
+      // =============================
+      // 🔥 2. Coba login sebagai arsitek
+      // =============================
+      response = await fetch("http://localhost:5000/api/arsitek/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      data = await response.json();
+
+      if (response.ok && data.arsitek) {
+        localStorage.setItem("user", JSON.stringify(data.arsitek));
+        navigate("/arsitek/dashboard");
+        return;
+      }
+
+      // =============================
+      // 🔥 3. Coba login sebagai user
+      // =============================
       response = await fetch("http://localhost:5000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,12 +61,12 @@ const Login = () => {
       data = await response.json();
 
       if (response.ok && data.user) {
-        console.log("Login user berhasil:", data);
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/user/dashboard");
-      } else {
-        setError(data.message || "Login gagal, periksa email dan password!");
+        return;
       }
+
+      setError(data.message || "Login gagal, periksa email & password!");
     } catch (err) {
       console.error(err);
       setError("Terjadi kesalahan koneksi ke server!");
@@ -75,7 +95,11 @@ const Login = () => {
         </h1>
         <p style={{ color: "#666", marginBottom: "30px" }}>Masuk ke akun Anda</p>
 
-        {error && <p style={{ color: "red", fontSize: "14px", marginBottom: "10px" }}>{error}</p>}
+        {error && (
+          <p style={{ color: "red", fontSize: "14px", marginBottom: "10px" }}>
+            {error}
+          </p>
+        )}
 
         <label>Email</label>
         <input
@@ -143,6 +167,16 @@ const Login = () => {
             onClick={() => navigate("/RegistrasiAdmin")}
           >
             Daftar Admin
+          </span>
+        </p>
+
+        <p style={{ marginTop: "10px", fontSize: "14px" }}>
+          Daftar sebagai arsitek?{" "}
+          <span
+            style={{ color: "#0056b3", cursor: "pointer", fontWeight: "600" }}
+            onClick={() => navigate("/RegistrasiArsitek")}
+          >
+            Daftar Arsitek
           </span>
         </p>
       </div>
