@@ -140,7 +140,7 @@ const JanjiView = () => {
             <span style={{ fontSize: '14px', fontWeight: '500' }}>User Management</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => navigate('/admin/orderMane  gement')}
+            onClick={() => navigate('/admin/orderManegement')}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             <span style={{ fontSize: '16px' }}>●</span>

@@ -3,56 +3,113 @@ import { Plus, X, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const JadwalKerja = () => {
-
-   const navigate = useNavigate(); 
-
+  const navigate = useNavigate();
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("add");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSchedule, setSelectedSchedule] = useState(null);
-
+  const [listArsitek, setListArsitek] = useState([]);
+  const [listMandor, setListMandor] = useState([]);
+  
   const [formData, setFormData] = useState({
     tanggal_Kerja: "",
     jam_masuk: "",
     nama: "",
-    tipe: "arsitek", // arsitek atau mandor
+    tipe: "arsitek",
   });
 
-  // Fetch data dari kedua tabel
+  const API_BASE_URL = "http://localhost:5000/api";
+
   useEffect(() => {
     fetchSchedules();
+    fetchListArsitek();
+    fetchListMandor();
   }, []);
 
   const fetchSchedules = async () => {
     setLoading(true);
     try {
-      // Fetch jadwal arsitek
-      const arsitekRes = await fetch("http://localhost:5000/api/jadwal/arsitek");
+      const arsitekRes = await fetch(`${API_BASE_URL}/jadwal/arsitek`);
+      if (!arsitekRes.ok) throw new Error('Failed to fetch arsitek schedules');
       const arsitekData = await arsitekRes.json();
-      
-      // Fetch jadwal mandor
-      const mandorRes = await fetch("http://localhost:5000/api/jadwal/mandor");
+     
+      const mandorRes = await fetch(`${API_BASE_URL}/jadwal/mandor`);
+      if (!mandorRes.ok) throw new Error('Failed to fetch mandor schedules');
       const mandorData = await mandorRes.json();
-
-      // Gabungkan data dengan menambahkan field 'tipe'
+      
       const combinedSchedules = [
         ...arsitekData.map(item => ({ ...item, tipe: "arsitek" })),
         ...mandorData.map(item => ({ ...item, tipe: "mandor" }))
       ];
-
-      // Sort berdasarkan tanggal
-      combinedSchedules.sort((a, b) => 
+      
+      combinedSchedules.sort((a, b) =>
         new Date(b.tanggal_Kerja) - new Date(a.tanggal_Kerja)
       );
-
+      
       setSchedules(combinedSchedules);
     } catch (error) {
       console.error("Error fetching schedules:", error);
       alert("Gagal memuat data jadwal");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchListArsitek = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/jadwal/list/arsitek`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      setListArsitek(data);
+    } catch (error) {
+      console.error("Error fetching arsitek list:", error);
+      // Fallback: coba fetch dari endpoint users dengan filter role arsitek
+      try {
+        const usersRes = await fetch(`${API_BASE_URL}/users`);
+        if (usersRes.ok) {
+          const users = await usersRes.json();
+          const arsitekUsers = users.filter(user => user.id_role === 3);
+          setListArsitek(arsitekUsers.map(user => ({
+            id_arsitek: user.id_user,
+            Nama_Lengkap: user.Nama_Lengkap,
+            status: 'aktif'
+          })));
+        }
+      } catch (fallbackError) {
+        console.error("Fallback juga gagal:", fallbackError);
+      }
+    }
+  };
+
+  const fetchListMandor = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/jadwal/list/mandor`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      setListMandor(data);
+    } catch (error) {
+      console.error("Error fetching mandor list:", error);
+      // Fallback: coba fetch dari endpoint users dengan filter role mandor
+      try {
+        const usersRes = await fetch(`${API_BASE_URL}/users`);
+        if (usersRes.ok) {
+          const users = await usersRes.json();
+          const mandorUsers = users.filter(user => user.id_role === 4);
+          setListMandor(mandorUsers.map(user => ({
+            id_mandor: user.id_user,
+            Nama_Lengkap: user.Nama_Lengkap,
+            status: 'aktif'
+          })));
+        }
+      } catch (fallbackError) {
+        console.error("Fallback juga gagal:", fallbackError);
+      }
     }
   };
 
@@ -96,9 +153,9 @@ const JadwalKerja = () => {
     }
 
     try {
-      const endpoint = formData.tipe === "arsitek" 
-        ? "http://localhost:5000/api/jadwal/arsitek"
-        : "http://localhost:5000/api/jadwal/mandor";
+      const baseEndpoint = formData.tipe === "arsitek" 
+        ? `${API_BASE_URL}/jadwal/arsitek`
+        : `${API_BASE_URL}/jadwal/mandor`;
 
       const payload = {
         tanggal_Kerja: formData.tanggal_Kerja,
@@ -106,19 +163,34 @@ const JadwalKerja = () => {
         [formData.tipe === "arsitek" ? "id_arsitek" : "id_mandor"]: formData.nama
       };
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      let response;
+      
+      if (modalType === "add") {
+        // CREATE operation
+        response = await fetch(baseEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // UPDATE operation
+        const id = selectedSchedule.id;
+        response = await fetch(`${baseEndpoint}/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
 
       if (response.ok) {
-        alert(`Jadwal ${formData.tipe} berhasil ditambahkan!`);
+        const result = await response.json();
+        alert(result.message);
         fetchSchedules();
         setShowModal(false);
         resetForm();
       } else {
-        alert("Gagal menambahkan jadwal");
+        const error = await response.json();
+        alert(error.error || "Terjadi kesalahan");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -127,11 +199,30 @@ const JadwalKerja = () => {
   };
 
   const handleDelete = async (schedule) => {
-    if (window.confirm(`Yakin ingin menghapus jadwal ${schedule.tipe} ini?`)) {
-      // Implementasi delete jika sudah ada endpoint
-      alert("Fitur hapus belum tersedia di backend");
-      // Sementara hapus dari state lokal
-      setSchedules(schedules.filter(s => s.id !== schedule.id));
+    if (!window.confirm(`Yakin ingin menghapus jadwal ${schedule.tipe} ini?`)) {
+      return;
+    }
+
+    try {
+      const baseEndpoint = schedule.tipe === "arsitek" 
+        ? `${API_BASE_URL}/jadwal/arsitek`
+        : `${API_BASE_URL}/jadwal/mandor`;
+
+      const response = await fetch(`${baseEndpoint}/${schedule.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+        fetchSchedules(); // Refresh data
+      } else {
+        const error = await response.json();
+        alert(error.error || "Gagal menghapus jadwal");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Terjadi kesalahan saat menghapus data");
     }
   };
 
@@ -150,17 +241,13 @@ const JadwalKerja = () => {
 
   const filteredSchedules = schedules.filter(s => {
     const searchLower = searchTerm.toLowerCase();
-    const nama = s.tipe === "arsitek" ? s.id_arsitek : s.id_mandor;
+    const nama = s.tipe === "arsitek" ? s.nama_arsitek : s.nama_mandor;
     return (
-      s.tanggal_Kerja.toLowerCase().includes(searchLower) ||
+      s.tanggal_Kerja?.toLowerCase().includes(searchLower) ||
       nama?.toString().toLowerCase().includes(searchLower) ||
-      s.tipe.toLowerCase().includes(searchLower)
+      s.tipe?.toLowerCase().includes(searchLower)
     );
   });
-
-  const handleNavigation = (path) => {
-    alert(`Navigasi ke: ${path}`);
-  };
 
   return (
     <div style={{ display: 'flex', height: '100vh', backgroundColor: '#0B0D1A', color: '#F3F4F6', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -217,7 +304,6 @@ const JadwalKerja = () => {
         <header style={{ backgroundColor: '#12142A', padding: '20px 28px', borderBottom: '1px solid #1A1D35' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'white', margin: 0 }}>Jadwal Kerja (Arsitek & Mandor)</h2>
         </header>
-
         <main style={{ padding: '28px' }}>
           {/* Action Bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -243,7 +329,9 @@ const JadwalKerja = () => {
             {loading ? (
               <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>Loading...</div>
             ) : filteredSchedules.length === 0 ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>Tidak ada data yang ditemukan</div>
+              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>
+                {searchTerm ? "Tidak ada data yang sesuai dengan pencarian" : "Tidak ada data jadwal kerja"}
+              </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -251,9 +339,9 @@ const JadwalKerja = () => {
                     <tr style={{ textAlign: 'left', fontSize: '12px', color: '#6B7280', borderBottom: '1px solid #1A1D35', backgroundColor: '#0B0D1A' }}>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>ID</th>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>Tipe</th>
+                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Nama</th>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>Tanggal Kerja</th>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>Jam Masuk</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>ID Petugas</th>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>Actions</th>
                     </tr>
                   </thead>
@@ -273,11 +361,11 @@ const JadwalKerja = () => {
                             {sched.tipe}
                           </span>
                         </td>
+                        <td style={{ padding: '16px 24px', fontSize: '14px', color: 'white' }}>
+                          {sched.tipe === "arsitek" ? sched.nama_arsitek : sched.nama_mandor}
+                        </td>
                         <td style={{ padding: '16px 24px', fontSize: '14px', color: 'white' }}>{sched.tanggal_Kerja}</td>
                         <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>{sched.jam_masuk}</td>
-                        <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>
-                          {sched.tipe === "arsitek" ? sched.id_arsitek : sched.id_mandor}
-                        </td>
                         <td style={{ padding: '16px 24px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <button onClick={() => openEditModal(sched)} style={{ padding: '6px 12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '6px', color: '#93C5FD', fontSize: '12px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.2s' }}
@@ -314,7 +402,6 @@ const JadwalKerja = () => {
                 <X size={20} />
               </button>
             </div>
-
             <div style={{ padding: '24px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
@@ -325,29 +412,37 @@ const JadwalKerja = () => {
                     <option value="mandor">Mandor</option>
                   </select>
                 </div>
-
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Tanggal Kerja *</label>
                   <input type="date" name="tanggal_Kerja" value={formData.tanggal_Kerja} onChange={handleInputChange}
                     style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
-
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Jam Masuk *</label>
                   <input type="time" name="jam_masuk" value={formData.jam_masuk} onChange={handleInputChange}
                     style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
-
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>
-                    ID {formData.tipe === "arsitek" ? "Arsitek" : "Mandor"} *
+                    {formData.tipe === "arsitek" ? "Nama Arsitek" : "Nama Mandor"} *
                   </label>
-                  <input type="text" name="nama" value={formData.nama} onChange={handleInputChange}
-                    placeholder={`Masukkan ID ${formData.tipe}`}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
+                  <select name="nama" value={formData.nama} onChange={handleInputChange}
+                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', cursor: 'pointer' }}>
+                    <option value="">-- Pilih {formData.tipe === "arsitek" ? "Arsitek" : "Mandor"} --</option>
+                    {(formData.tipe === "arsitek" ? listArsitek : listMandor).map((person) => (
+                      <option key={formData.tipe === "arsitek" ? person.id_arsitek : person.id_mandor}
+                              value={formData.tipe === "arsitek" ? person.id_arsitek : person.id_mandor}>
+                        {person.Nama_Lengkap}
+                      </option>
+                    ))}
+                  </select>
+                  {(formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0) && (
+                    <p style={{ fontSize: '12px', color: '#EF4444', margin: '4px 0 0 0' }}>
+                      Tidak ada {formData.tipe === "arsitek" ? "arsitek" : "mandor"} yang tersedia
+                    </p>
+                  )}
                 </div>
               </div>
-
               <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
                 <button onClick={() => setShowModal(false)}
                   style={{ flex: 1, padding: '10px', backgroundColor: '#1A1D35', border: '1px solid #2D3748', borderRadius: '8px', color: '#9CA3AF', fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s' }}
@@ -356,9 +451,30 @@ const JadwalKerja = () => {
                   Cancel
                 </button>
                 <button onClick={handleSubmit}
-                  style={{ flex: 1, padding: '10px', backgroundColor: '#7C3AED', border: 'none', borderRadius: '8px', color: 'white', fontSize: '14px', fontWeight: '500', cursor: 'pointer', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)', transition: 'all 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                  disabled={(formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0)}
+                  style={{ 
+                    flex: 1, 
+                    padding: '10px', 
+                    backgroundColor: (formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0) ? '#6B7280' : '#7C3AED', 
+                    border: 'none', 
+                    borderRadius: '8px', 
+                    color: 'white', 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    cursor: (formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0) ? 'not-allowed' : 'pointer', 
+                    boxShadow: (formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0) ? 'none' : '0 4px 12px rgba(124, 58, 237, 0.4)', 
+                    transition: 'all 0.2s' 
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!(formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0)) {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!(formData.tipe === "arsitek" ? listArsitek.length === 0 : listMandor.length === 0)) {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }
+                  }}>
                   {modalType === "add" ? "Tambah Jadwal" : "Update Jadwal"}
                 </button>
               </div>

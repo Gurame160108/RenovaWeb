@@ -2,18 +2,23 @@ import React, { useState, useEffect } from "react";
 import { MoreHorizontal, Plus, X, Search, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-
 const UserManagement = () => {
-
   const navigate = useNavigate(); 
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState([
+    { id_role: 1, role: "admin" },
+    { id_role: 2, role: "user" },
+    { id_role: 3, role: "arsitek" },
+    { id_role: 4, role: "mandor" },
+    { id_role: 5, role: "ceo" }
+  ]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("add");
   const [searchTerm, setSearchTerm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     Nama_Lengkap: "",
@@ -30,6 +35,7 @@ const UserManagement = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/users`);
+      if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -40,26 +46,12 @@ const UserManagement = () => {
     }
   };
 
-  const fetchRoles = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/roles`);
-      const data = await response.json();
-      setRoles(data);
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-      setRoles([
-        { id_role: 1, role: "admin" },
-        { id_role: 2, role: "user" },
-        { id_role: 3, role: "arsitek" },
-        { id_role: 4, role: "mandor" },
-        { id_role: 5, role: "ceo" }
-      ]);
-    }
-  };
+  // Hapus fetchRoles karena kita menggunakan static roles
+  // atau gunakan fallback seperti di bawah
 
   useEffect(() => {
     fetchUsers();
-    fetchRoles();
+    // Tidak perlu fetch roles karena sudah didefinisikan static
   }, []);
 
   const handleInputChange = (e) => {
@@ -71,34 +63,44 @@ const UserManagement = () => {
   };
 
   const handleAddUser = async () => {
+    setSubmitLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          id_role: parseInt(formData.id_role)
+        })
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        alert("User berhasil ditambahkan!");
+        alert("User berhasil ditambahkan dan otomatis terdaftar di tabel role terkait!");
         setShowModal(false);
         resetForm();
         fetchUsers();
       } else {
-        alert(result.message || "Gagal menambahkan user");
+        alert(result.message || result.error || "Gagal menambahkan user");
       }
     } catch (error) {
       console.error("Error adding user:", error);
       alert("Terjadi kesalahan saat menambahkan user");
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
   const handleEditUser = async () => {
+    setSubmitLoading(true);
     try {
-      const updateData = { ...formData };
+      const updateData = { 
+        ...formData,
+        id_role: parseInt(formData.id_role)
+      };
       delete updateData.password;
 
       const response = await fetch(`${API_BASE_URL}/users/${selectedUser.id_user}`, {
@@ -112,21 +114,23 @@ const UserManagement = () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert("User berhasil diupdate!");
+        alert("User berhasil diupdate! Data role otomatis disesuaikan.");
         setShowModal(false);
         resetForm();
         fetchUsers();
       } else {
-        alert(result.message || "Gagal mengupdate user");
+        alert(result.message || result.error || "Gagal mengupdate user");
       }
     } catch (error) {
       console.error("Error updating user:", error);
       alert("Terjadi kesalahan saat mengupdate user");
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
   const handleDeleteUser = async (id) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus user ini?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus user ini? Data akan dihapus dari semua tabel terkait.")) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/users/${id}`, {
@@ -134,10 +138,11 @@ const UserManagement = () => {
       });
 
       if (response.ok) {
-        alert("User berhasil dihapus!");
+        alert("User berhasil dihapus dari semua tabel!");
         fetchUsers();
       } else {
-        alert("Gagal menghapus user");
+        const result = await response.json();
+        alert(result.error || "Gagal menghapus user");
       }
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -175,6 +180,7 @@ const UserManagement = () => {
       id_role: "2"
     });
     setSelectedUser(null);
+    setShowPassword(false);
   };
 
   const getRoleName = (id_role) => {
@@ -182,19 +188,36 @@ const UserManagement = () => {
     return role ? role.role : "Unknown";
   };
 
+  const getRoleDescription = (id_role) => {
+    const descriptions = {
+      1: "Admin - Akses penuh sistem",
+      2: "User - Customer biasa",
+      3: "Arsitek - Profesional desain bangunan",
+      4: "Mandor - Pengawas lapangan proyek", 
+      5: "CEO - Pimpinan perusahaan"
+    };
+    return descriptions[id_role] || "Unknown role";
+  };
+
   const filteredUsers = users.filter(user =>
-    user.Nama_Lengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.Nama_Lengkap?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getRoleName(user.id_role)?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSubmit = () => {
-    if (!formData.Nama_Lengkap || !formData.email) {
+    if (!formData.Nama_Lengkap.trim() || !formData.email.trim()) {
       alert("Nama dan Email wajib diisi!");
       return;
     }
+    
     if (modalType === "add") {
       if (!formData.password) {
         alert("Password wajib diisi!");
+        return;
+      }
+      if (formData.password.length < 6) {
+        alert("Password minimal 6 karakter!");
         return;
       }
       handleAddUser();
@@ -203,6 +226,7 @@ const UserManagement = () => {
     }
   };
 
+  // ... (kode JSX tetap sama seperti sebelumnya)
   return (
     <div style={{ 
       display: 'flex', 
@@ -238,82 +262,93 @@ const UserManagement = () => {
           flexDirection: 'column',
           gap: '4px'
         }}>
-           <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px 12px',
-                        borderRadius: '8px',
-                        color: 'white',
-                        cursor: 'pointer',
-                        boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
-                      }}
-                      onClick={() => navigate('/admin/dashboard')}
-                    >
-                      <span style={{ fontSize: '16px' }}>●</span>
-                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px 12px',
-                        backgroundColor: '#7C3AED',
-                        borderRadius: '8px',
-                        color: '#9CA3AF',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => navigate('/admin/userManager')}   // <-- pindah ke User Management
-                    >
-                      <span style={{ fontSize: '16px' }}>●</span>
-                      <span style={{ fontSize: '14px', fontWeight: '500' }}>User Management</span>
-                    </div>
-                   <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px 12px',
-                        borderRadius: '8px',
-                        color: '#9CA3AF',
-                        cursor: 'pointer',
-                        boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
-                      }}
-                      onClick={() => navigate('/admin/orderManegement')}   // <-- pindah ke User Management
-                    >
-                      <span style={{ fontSize: '16px' }}>●</span>
-                      <span style={{ fontSize: '14px', fontWeight: '500' }}>order Management</span>
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      color: '#9CA3AF',
-                      cursor: 'pointer',
-                      boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
-                    }}
-                    onClick={() => navigate('/admin/jadwalKerja')} >
-                      <span style={{ fontSize: '16px' }}>●</span>
-                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '10px 12px',
-                      borderRadius: '8px',
-                      color: '#9CA3AF',
-                      cursor: 'pointer',
-                      boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)'
-                    }}
-                    onClick={() => navigate('/admin/janjiView')} >
-                      <span style={{ fontSize: '16px' }}>●</span>
-                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Janji Konsultasi</span>
-                    </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              color: '#9CA3AF',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => navigate('/admin/dashboard')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 12px',
+              backgroundColor: '#7C3AED',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: 'pointer'
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>User Management</span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              color: '#9CA3AF',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => navigate('/admin/orderManegement')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Order Management</span>
+          </div>
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              color: '#9CA3AF',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => navigate('/admin/jadwalKerja')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
+          </div>
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              color: '#9CA3AF',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onClick={() => navigate('/admin/janjiView')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Janji Konsultasi</span>
+          </div>
         </nav>
 
         <div style={{ 
@@ -367,6 +402,13 @@ const UserManagement = () => {
             color: 'white',
             margin: 0
           }}>User Management</h2>
+          <p style={{ 
+            fontSize: '14px',
+            color: '#9CA3AF',
+            margin: '4px 0 0 0'
+          }}>
+            Kelola pengguna sistem - Data otomatis tersinkronisasi dengan tabel role terkait
+          </p>
         </header>
 
         <main style={{ 
@@ -388,7 +430,7 @@ const UserManagement = () => {
               }} />
               <input
                 type="text"
-                placeholder="Search by name or email..."
+                placeholder="Cari nama, email, atau role..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
@@ -417,11 +459,14 @@ const UserManagement = () => {
                 fontSize: '14px',
                 fontWeight: '500',
                 cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)'
+                boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)',
+                transition: 'transform 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               <Plus size={18} />
-              Add User
+              Tambah User
             </button>
           </div>
 
@@ -434,7 +479,11 @@ const UserManagement = () => {
           }}>
             {loading ? (
               <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>
-                Loading users...
+                Memuat data user...
+              </div>
+            ) : filteredUsers.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>
+                {searchTerm ? "Tidak ada user yang sesuai dengan pencarian" : "Belum ada data user"}
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
@@ -448,12 +497,12 @@ const UserManagement = () => {
                       backgroundColor: '#0B0D1A'
                     }}>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>ID</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Name</th>
+                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Nama</th>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>Email</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Phone</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Address</th>
+                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Telepon</th>
+                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Alamat</th>
                       <th style={{ padding: '12px 24px', fontWeight: '500' }}>Role</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Actions</th>
+                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -517,8 +566,11 @@ const UserManagement = () => {
                                 color: '#93C5FD',
                                 fontSize: '12px',
                                 cursor: 'pointer',
-                                fontWeight: '500'
+                                fontWeight: '500',
+                                transition: 'all 0.2s'
                               }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)'}
                             >
                               Edit
                             </button>
@@ -532,10 +584,13 @@ const UserManagement = () => {
                                 color: '#FCA5A5',
                                 fontSize: '12px',
                                 cursor: 'pointer',
-                                fontWeight: '500'
+                                fontWeight: '500',
+                                transition: 'all 0.2s'
                               }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}
                             >
-                              Delete
+                              Hapus
                             </button>
                           </div>
                         </td>
@@ -584,7 +639,7 @@ const UserManagement = () => {
                 color: 'white',
                 margin: 0
               }}>
-                {modalType === "add" ? "Add New User" : "Edit User"}
+                {modalType === "add" ? "Tambah User Baru" : "Edit User"}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -592,8 +647,12 @@ const UserManagement = () => {
                   background: 'none',
                   border: 'none',
                   color: '#6B7280',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  padding: '4px'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 <X size={20} />
               </button>
@@ -603,7 +662,7 @@ const UserManagement = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>
-                    Full Name *
+                    Nama Lengkap *
                   </label>
                   <input
                     type="text"
@@ -621,6 +680,7 @@ const UserManagement = () => {
                       outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    placeholder="Masukkan nama lengkap"
                   />
                 </div>
 
@@ -644,6 +704,7 @@ const UserManagement = () => {
                       outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    placeholder="contoh@email.com"
                   />
                 </div>
 
@@ -660,7 +721,7 @@ const UserManagement = () => {
                         onChange={handleInputChange}
                         style={{
                           width: '100%',
-                          padding: '10px 12px',
+                          padding: '10px 12px 10px 12px',
                           backgroundColor: '#0B0D1A',
                           border: '1px solid #1A1D35',
                           borderRadius: '8px',
@@ -669,8 +730,10 @@ const UserManagement = () => {
                           outline: 'none',
                           boxSizing: 'border-box'
                         }}
+                        placeholder="Minimal 6 karakter"
                       />
                       <button
+                        type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
                           position: 'absolute',
@@ -680,8 +743,12 @@ const UserManagement = () => {
                           background: 'none',
                           border: 'none',
                           color: '#6B7280',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          borderRadius: '4px',
+                          padding: '4px'
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -691,7 +758,7 @@ const UserManagement = () => {
 
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>
-                    Phone Number
+                    Nomor Telepon
                   </label>
                   <input
                     type="text"
@@ -709,12 +776,13 @@ const UserManagement = () => {
                       outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    placeholder="Contoh: 081234567890"
                   />
                 </div>
 
                 <div>
                   <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>
-                    Address
+                    Alamat
                   </label>
                   <textarea
                     name="alamat"
@@ -733,6 +801,7 @@ const UserManagement = () => {
                       resize: 'vertical',
                       boxSizing: 'border-box'
                     }}
+                    placeholder="Masukkan alamat lengkap"
                   />
                 </div>
 
@@ -763,6 +832,9 @@ const UserManagement = () => {
                       </option>
                     ))}
                   </select>
+                  <p style={{ fontSize: '12px', color: '#6B7280', margin: '4px 0 0 0' }}>
+                    {getRoleDescription(parseInt(formData.id_role))}
+                  </p>
                 </div>
               </div>
 
@@ -773,6 +845,7 @@ const UserManagement = () => {
               }}>
                 <button
                   onClick={() => setShowModal(false)}
+                  disabled={submitLoading}
                   style={{
                     flex: 1,
                     padding: '10px',
@@ -782,27 +855,33 @@ const UserManagement = () => {
                     color: '#9CA3AF',
                     fontSize: '14px',
                     fontWeight: '500',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    opacity: submitLoading ? 0.6 : 1
                   }}
+                  onMouseEnter={(e) => !submitLoading && (e.currentTarget.style.backgroundColor = '#2D3748')}
+                  onMouseLeave={(e) => !submitLoading && (e.currentTarget.style.backgroundColor = '#1A1D35')}
                 >
-                  Cancel
+                  Batal
                 </button>
                 <button
                   onClick={handleSubmit}
+                  disabled={submitLoading}
                   style={{
                     flex: 1,
                     padding: '10px',
-                    backgroundColor: '#7C3AED',
+                    backgroundColor: submitLoading ? '#6B7280' : '#7C3AED',
                     border: 'none',
                     borderRadius: '8px',
                     color: 'white',
                     fontSize: '14px',
                     fontWeight: '500',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)'
+                    cursor: submitLoading ? 'not-allowed' : 'pointer',
+                    boxShadow: submitLoading ? 'none' : '0 4px 12px rgba(124, 58, 237, 0.4)',
+                    transition: 'all 0.2s'
                   }}
                 >
-                  {modalType === "add" ? "Add User" : "Update User"}
+                  {submitLoading ? 'Memproses...' : (modalType === "add" ? "Tambah User" : "Update User")}
                 </button>
               </div>
             </div>
