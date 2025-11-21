@@ -1,333 +1,268 @@
 import React, { useState } from "react";
-import { Plus, X, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const JadwalKerja = () => {
-
-  // Data dummy
-  const [schedules, setSchedules] = useState([
-    { id: 1, nama_program: "Renovasi Rumah Bpk. Ahmad", tanggal_mulai: "2025-11-10", tanggal_selesai: "2025-12-25", mandor: "Slamet Riyadi", status: "onprogress" },
-    { id: 2, nama_program: "Bangun Gedung Kantor PT. XYZ", tanggal_mulai: "2025-10-01", tanggal_selesai: "2026-03-15", mandor: "Budi Santoso", status: "onprogress" },
-    { id: 3, nama_program: "Interior Apartemen Green Lake", tanggal_mulai: "2025-09-20", tanggal_selesai: "2025-11-05", mandor: "Agus Pranoto", status: "completed" },
-    { id: 4, nama_program: "Perbaikan Atap Gudang", tanggal_mulai: "2025-11-01", tanggal_selesai: "2025-11-20", mandor: "Wahyu", status: "pending" },
-    { id: 5, nama_program: "Proyek Villa Bali", tanggal_mulai: "2025-08-15", tanggal_selesai: "2025-10-30", mandor: "Komang Adi", status: "cancelled" },
-  ]);
-
-  const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState("add");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
-
-  const [formData, setFormData] = useState({
-    nama_program: "",
-    tanggal_mulai: "",
-    tanggal_selesai: "",
-    mandor: "",
-    status: "pending",
-  });
-
-  const openAddModal = () => {
-    setModalType("add");
-    resetForm();
-    setShowModal(true);
-  };
-
-  const openEditModal = (sched) => {
-    setModalType("edit");
-    setSelectedSchedule(sched);
-    setFormData({
-      nama_program: sched.nama_program,
-      tanggal_mulai: sched.tanggal_mulai,
-      tanggal_selesai: sched.tanggal_selesai,
-      mandor: sched.mandor,
-      status: sched.status,
-    });
-    setShowModal(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      nama_program: "",
-      tanggal_mulai: "",
-      tanggal_selesai: "",
-      mandor: "",
-      status: "pending",
-    });
-    setSelectedSchedule(null);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = () => {
-    if (!formData.nama_program || !formData.tanggal_mulai || !formData.tanggal_selesai || !formData.mandor) {
-      alert("Semua field wajib diisi!");
-      return;
-    }
-
-    if (modalType === "add") {
-      const newId = Math.max(...schedules.map(s => s.id), 0) + 1;
-      setSchedules([...schedules, { id: newId, ...formData }]);
-      alert("Program kerja berhasil ditambahkan!");
-    } else {
-      setSchedules(schedules.map(s => s.id === selectedSchedule.id ? { ...s, ...formData } : s));
-      alert("Program kerja berhasil diupdate!");
-    }
-
-    setShowModal(false);
-    resetForm();
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Yakin ingin menghapus program kerja ini?")) {
-      setSchedules(schedules.filter(s => s.id !== id));
-      alert("Program kerja dihapus!");
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    const styles = {
-      onprogress: { bg: "rgba(59, 130, 246, 0.2)", color: "#93C5FD", border: "rgba(59, 130, 246, 0.3)" },
-      completed: { bg: "rgba(34, 197, 94, 0.2)", color: "#86EFAC", border: "rgba(34, 197, 94, 0.3)" },
-      pending: { bg: "rgba(251, 191, 36, 0.2)", color: "#FDE047", border: "rgba(251, 191, 36, 0.3)" },
-      cancelled: { bg: "rgba(239, 68, 68, 0.2)", color: "#FCA5A5", border: "rgba(239, 68, 68, 0.3)" },
-    };
-    const s = styles[status] || styles.pending;
-    return {
-      backgroundColor: s.bg,
-      color: s.color,
-      border: `1px solid ${s.border}`,
-    };
-  };
-
-  const filteredSchedules = schedules.filter(s =>
-    s.nama_program.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.mandor.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+const JadwalKerjaA = () => {
   const navigate = useNavigate();
 
-  const handleNavigation = (path) => {
-    navigate(path);
+  const [activeTab, setActiveTab] = useState("arsitek");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // --- DATA JADWAL MANDOR ---
+  const [jadwalArsitek] = useState([
+    { id: 1, nama_program: "Renovasi Rumah Bpk. Ahmad", tanggal_kerja: "2025-11-21", jam_masuk: "08:00", status_persetujuan: "disetujui", admin: "paeng" },
+    { id: 2, nama_program: "Bangun Gedung Kantor PT. XYZ", tanggal_kerja: "2025-11-21", jam_masuk: "09:30", status_persetujuan: "menunggu", admin: "paeng" },
+    { id: 3, nama_program: "Interior Apartemen Green Lake", tanggal_kerja: "2025-11-20", jam_masuk: "07:45", status_persetujuan: "ditolak", admin: "paeng" },
+  ]);
+
+  // --- DATA JADWAL KONSULTASI ---
+  const [jadwalKonsultasi] = useState([
+    { id_janji: 11, nama_user: "Budi", tanggal_kerja: "2025-11-22", jam_masuk: "13:00", status: "disetujui" },
+    { id_janji: 12, nama_user: "Cici", tanggal_kerja: "2025-11-23", jam_masuk: "10:00", status: "menunggu" },
+    { id_janji: 13, nama_user: "Eka", tanggal_kerja: "2025-11-23", jam_masuk: "15:30", status: "ditolak" },
+  ]);
+
+  const getStatusBadge = (status) => {
+    const map = {
+      disetujui: { bg: "#15803D33", color: "#86EFAC" },
+      menunggu: { bg: "#D9770633", color: "#FDE047" },
+      ditolak: { bg: "#B91C1C33", color: "#FCA5A5" },
+    };
+    return {
+      ...map[status] || map.menunggu,
+      padding: "4px 12px",
+      borderRadius: "20px",
+      fontSize: "11px",
+      fontWeight: "600",
+      textTransform: "uppercase",
+    };
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#0B0D1A', color: '#F3F4F6', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Sidebar */}
-      <div style={{ width: '256px', backgroundColor: '#12142A', borderRight: '1px solid #1A1D35', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid #1A1D35' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', margin: 0 }}>Renova</h1>
+    <div style={{ display: "flex", height: "100vh", backgroundColor: "#0B0D1A", color: "#F3F4F6", fontFamily: "Inter, sans-serif" }}>
+      
+      {/* SIDEBAR */}
+      <div style={{ width: "256px", backgroundColor: "#12142A", borderRight: "1px solid #1A1D35", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "24px", borderBottom: "1px solid #1A1D35" }}>
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>Renova</h1>
         </div>
-        <nav style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/arsitek/dashboard')}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
+
+        {/* MENU */}
+        <nav style={{ flex: 1, padding: "16px", display: "flex", flexDirection: "column", gap: "4px" }}>
+          
+          {/* LIST MENU */}
+          <div
+            onClick={() => navigate("/arsitek/dashboard")}
+            style={{ ...menuItemStyle(false) }}
+          >
+            <span style={dotStyle}>●</span> Dashboard
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
-            onClick={() => navigate('/arsitek/projectKerjaan')}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Daftar Projek</span>
+
+          <div
+            onClick={() => navigate("/arsitek/InstruksiMandorA")}
+            style={menuItemStyle(false)}
+          >
+            <span style={dotStyle}>●</span> Instruksi Mandor
           </div>
-          {/* <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/arsitek/orderManagement')}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Order Management</span>
-          </div> */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', backgroundColor: '#7C3AED', borderRadius: '8px', color: 'white', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)' }}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
+
+          {/* --- MENU JADWAL (ACTIVE) --- */}
+          <div
+            onClick={() => navigate("/arsitek/JadwalKerjaA")}
+            style={menuItemStyle(true)}
+          >
+            <span style={dotStyle}>●</span> Jadwal Kerja
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
-            onClick={() => navigate('/arsitek/laporanProject')}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Laporan Kerja</span>
+
+          {/* SUBMENU (DITARUH DI BAWAH JADWAL) */}
+          <div style={{ marginLeft: "34px", marginTop: "6px", display: "flex", flexDirection: "column", gap: "6px" }}>
+            
+            <div
+              onClick={() => setActiveTab("arsitek")}
+              style={{
+                ...submenuStyle,
+                backgroundColor: activeTab === "arsitek" ? "#7C3AED55" : "transparent",
+                color: activeTab === "arsitek" ? "white" : "#9CA3AF",
+              }}
+            >
+              • Jadwal Arsitek
+            </div>
+
+            <div
+              onClick={() => setActiveTab("konsultasi")}
+              style={{
+                ...submenuStyle,
+                backgroundColor: activeTab === "konsultasi" ? "#7C3AED55" : "transparent",
+                color: activeTab === "konsultasi" ? "white" : "#9CA3AF",
+              }}
+            >
+              • Jadwal Konsultasi
+            </div>
+
           </div>
-          {/* <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/admin/janjiView')}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Janji Konsultasi</span>
-          </div> */}
+
+          <div
+            onClick={() => navigate("/arsitek/laporanProject")}
+            style={menuItemStyle(false)}
+          >
+            <span style={dotStyle}>●</span> Laporan Kerja
+          </div>
+
+          <div
+            onClick={() => navigate("/arsitek/DesainRevisiArsitek")}
+            style={menuItemStyle(false)}
+          >
+            <span style={dotStyle}>●</span> Desain Revisi
+          </div>
+
+          <div
+            onClick={() => navigate("/arsitek/laporanMandor")}
+            style={menuItemStyle(false)}
+          >
+            <span style={dotStyle}>●</span> Laporan Mandor
+          </div>
         </nav>
-        <div style={{ padding: '16px', borderTop: '1px solid #1A1D35', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>RG</div>
-          <div>
-            <p style={{ fontSize: '14px', fontWeight: '600', color: 'white', margin: 0 }}>Roihan Galang</p>
-            <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>Admin account</p>
-          </div>
-        </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#0B0D1A' }}>
-        <header style={{ backgroundColor: '#12142A', padding: '20px 28px', borderBottom: '1px solid #1A1D35' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'white', margin: 0 }}>Program Kerja</h2>
-        </header>
+      {/* MAIN CONTENT */}
+      <div style={{ flex: 1, overflow: "auto", padding: "28px" }}>
+        <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "24px" }}>
+          {activeTab === "arsitek" ? "Jadwal Kerja Arsitek" : "Jadwal Konsultasi"}
+        </h2>
 
-        <main style={{ padding: '28px' }}>
-          {/* Action Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <div style={{ position: 'relative', width: '320px' }}>
-              <Search size={18} color="#6B7280" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-              <input
-                type="text"
-                placeholder="Cari nama program atau mandor..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px 10px 40px', backgroundColor: '#12142A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none' }}
-              />
-            </div>
-            <button onClick={openAddModal} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#7C3AED', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-              <Plus size={18} /> Add Schedule
-            </button>
+        {/* SEARCH */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}>
+          <div style={{ position: "relative", width: "320px" }}>
+            <Search
+              size={18}
+              color="#6B7280"
+              style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }}
+            />
+            <input
+              placeholder="Cari..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={searchInputStyle}
+            />
           </div>
+        </div>
 
-          {/* Table */}
-          <div style={{ backgroundColor: '#12142A', borderRadius: '12px', border: '1px solid #1A1D35', overflow: 'hidden' }}>
-            {loading ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>Loading...</div>
-            ) : filteredSchedules.length === 0 ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>Tidak ada data yang ditemukan</div>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ textAlign: 'left', fontSize: '12px', color: '#6B7280', borderBottom: '1px solid #1A1D35', backgroundColor: '#0B0D1A' }}>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>ID</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Nama Program</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Mulai</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Selesai</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Mandor</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Status</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Actions</th>
+        {/* TABLE */}
+        <div style={tableCardStyle}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={tableHeaderRowStyle}>
+                {activeTab === "arsitek" ? (
+                  <>
+                    <th style={thStyle}>ID</th>
+                    <th style={thStyle}>Nama Program</th>
+                    <th style={thStyle}>Tanggal Kerja</th>
+                    <th style={thStyle}>Jam Masuk</th>
+                    <th style={thStyle}>Status</th>
+                    <th style={thStyle}>Admin</th>
+                  </>
+                ) : (
+                  <>
+                    <th style={thStyle}>ID Janji</th>
+                    <th style={thStyle}>Nama Klien</th>
+                    <th style={thStyle}>Tanggal</th>
+                    <th style={thStyle}>Jam</th>
+                    <th style={thStyle}>Status</th>
+                  </>
+                )}
+              </tr>
+            </thead>
+
+            <tbody>
+              {activeTab === "arsitek"
+                ? jadwalArsitek.map((s) => (
+                    <tr key={s.id} style={tableRowStyle}>
+                      <td style={tdStyle}>{s.id}</td>
+                      <td style={{ ...tdStyle, fontWeight: "500" }}>{s.nama_program}</td>
+                      <td style={tdMuted}>{s.tanggal_kerja}</td>
+                      <td style={tdMuted}>{s.jam_masuk}</td>
+                      <td style={tdStyle}>
+                        <span style={getStatusBadge(s.status_persetujuan)}>{s.status_persetujuan}</span>
+                      </td>
+                      <td style={tdMuted}>{s.admin}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {filteredSchedules.map((sched) => (
-                      <tr key={sched.id} style={{ borderBottom: '1px solid #1A1D35' }}>
-                        <td style={{ padding: '16px 24px', fontSize: '14px', color: 'white' }}>{sched.id}</td>
-                        <td style={{ padding: '16px 24px', fontSize: '14px', color: 'white', fontWeight: '500' }}>{sched.nama_program}</td>
-                        <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>{sched.tanggal_mulai}</td>
-                        <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>{sched.tanggal_selesai}</td>
-                        <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>{sched.mandor}</td>
-                        <td style={{ padding: '16px 24px' }}>
-                          <span style={{
-                            padding: '4px 12px',
-                            borderRadius: '20px',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            textTransform: 'uppercase',
-                            ...getStatusBadge(sched.status)
-                          }}>
-                            {sched.status === "onprogress" ? "On Progress" : sched.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '16px 24px' }}>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button onClick={() => openEditModal(sched)} style={{ padding: '6px 12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '6px', color: '#93C5FD', fontSize: '12px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.2s' }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)'}>
-                              Edit
-                            </button>
-                            <button onClick={() => handleDelete(sched.id)} style={{ padding: '6px 12px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', color: '#FCA5A5', fontSize: '12px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.2s' }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}>
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
-
-      {/* Modal Add / Edit */}
-      {showModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: '#12142A', borderRadius: '12px', border: '1px solid #1A1D35', width: '520px', maxHeight: '90vh', overflow: 'auto' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1A1D35', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '600', color: 'white', margin: 0 }}>
-                {modalType === "add" ? "Tambah Program Kerja" : "Edit Program Kerja"}
-              </h3>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#6B7280', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Nama Program *</label>
-                  <input type="text" name="nama_program" value={formData.nama_program} onChange={handleInputChange}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Tanggal Mulai *</label>
-                  <input type="date" name="tanggal_mulai" value={formData.tanggal_mulai} onChange={handleInputChange}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Tanggal Selesai *</label>
-                  <input type="date" name="tanggal_selesai" value={formData.tanggal_selesai} onChange={handleInputChange}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Mandor *</label>
-                  <input type="text" name="mandor" value={formData.mandor} onChange={handleInputChange}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', color: '#9CA3AF', marginBottom: '6px' }}>Status</label>
-                  <select name="status" value={formData.status} onChange={handleInputChange}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: '#0B0D1A', border: '1px solid #1A1D35', borderRadius: '8px', color: 'white', fontSize: '14px', outline: 'none', cursor: 'pointer' }}>
-                    <option value="pending">Pending</option>
-                    <option value="onprogress">On Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-                <button onClick={() => setShowModal(false)}
-                  style={{ flex: 1, padding: '10px', backgroundColor: '#1A1D35', border: '1px solid #2D3748', borderRadius: '8px', color: '#9CA3AF', fontSize: '14px', fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2D3748'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}>
-                  Cancel
-                </button>
-                <button onClick={handleSubmit}
-                  style={{ flex: 1, padding: '10px', backgroundColor: '#7C3AED', border: 'none', borderRadius: '8px', color: 'white', fontSize: '14px', fontWeight: '500', cursor: 'pointer', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)', transition: 'all 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-                  {modalType === "add" ? "Tambah Program" : "Update Program"}
-                </button>
-              </div>
-            </div>
-          </div>
+                  ))
+                : jadwalKonsultasi.map((j) => (
+                    <tr key={j.id_janji} style={tableRowStyle}>
+                      <td style={tdStyle}>{j.id_janji}</td>
+                      <td style={{ ...tdStyle, fontWeight: "500" }}>{j.nama_user}</td>
+                      <td style={tdMuted}>{j.tanggal_kerja}</td>
+                      <td style={tdMuted}>{j.jam_masuk}</td>
+                      <td style={tdStyle}>
+                        <span style={getStatusBadge(j.status)}>{j.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default JadwalKerja;
+/* ---------- STYLE OBJECTS ---------- */
+const menuItemStyle = (active) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  padding: "10px 12px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  backgroundColor: active ? "#7C3AED" : "transparent",
+  color: active ? "white" : "#9CA3AF",
+  fontSize: "14px",
+});
+
+const submenuStyle = {
+  padding: "8px 12px",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "13px",
+};
+
+const dotStyle = { fontSize: "16px" };
+
+const searchInputStyle = {
+  width: "100%",
+  padding: "10px 12px 10px 40px",
+  borderRadius: "8px",
+  border: "1px solid #1A1D35",
+  background: "#12142A",
+  color: "white",
+  outline: "none",
+};
+
+const tableCardStyle = {
+  background: "#12142A",
+  borderRadius: "12px",
+  overflow: "hidden",
+  border: "1px solid #1A1D35",
+};
+
+const tableHeaderRowStyle = {
+  color: "#6B7280",
+  fontSize: "12px",
+  borderBottom: "1px solid #1A1D35",
+};
+
+const thStyle = { padding: "12px 24px", textAlign: "left" };
+
+const tableRowStyle = {
+  borderBottom: "1px solid #1A1D35",
+  color: "white",
+};
+
+const tdStyle = { padding: "16px 24px" };
+
+const tdMuted = {
+  padding: "16px 24px",
+  color: "#9CA3AF",
+};
+
+export default JadwalKerjaA;
+  

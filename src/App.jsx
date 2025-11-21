@@ -12,7 +12,11 @@ import DashboardMandor from "./mandor/DashboardMandor.jsx";
 import DashboardArsitek from "./arsitek/DashboardArsitek.jsx";
 import JadwalKerja from "./arsitek/jadwalKerjaA.jsx";
 import LaporanProject from "./arsitek/laporanProject.jsx";
+import DesainRevisiArsitek from "./arsitek/DesainRevisiArsitek.jsx";
 import DashboardUser from "./user/DashboardUser.jsx";
+import LaporanMandor from "./arsitek/LaporanMandor.jsx";
+import IntruksiMandor from "./arsitek/InstruksiMandorA.jsx";
+
 
 
 
@@ -34,6 +38,9 @@ function App() {
       <Route path = "/arsitek/dashboard" element={<DashboardArsitek/>} /> 
       <Route path = "/arsitek/jadwalKerjaA" element={<JadwalKerja/>} />
       <Route path = "/arsitek/laporanProject" element={<LaporanProject/>} />
+      <Route path = "/arsitek/DesainRevisiArsitek" element={<DesainRevisiArsitek/>} />
+      <Route path = "/arsitek/laporanMandor" element={<LaporanMandor/>} />
+      <Route path = "/arsitek/instruksiMandorA" element={<IntruksiMandor/>} />
     </Routes>
   );
 }
