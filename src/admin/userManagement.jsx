@@ -382,6 +382,25 @@ const UserManagement = () => {
               margin: 0
             }}>Admin account</p>
           </div>
+          <div
+                style={{
+                  marginTop: "12px",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "#EF4444",
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "0.3s"
+                }}
+                onClick={() => {
+                  localStorage.removeItem("user");
+                  navigate("/");
+                }}
+              >
+          Logout
+          </div>
         </div>
       </div>
 

@@ -45,7 +45,7 @@ const Login = () => {
 
       if (response.ok && data.arsitek) {
         localStorage.setItem("user", JSON.stringify(data.arsitek));
-        navigate("/arsitek/dashboard");
+        navigate("/arsitek/DashboardArsitek");
         return;
       }
 
@@ -74,114 +74,138 @@ const Login = () => {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", backgroundColor: "#f2f4f7" }}>
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#fff",
-          boxShadow: "0 0 20px rgba(0,0,0,0.1)",
-          borderRadius: "10px",
-          margin: "auto",
-          width: "400px",
-          height: "480px",
-        }}
-      >
-        <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#0056b3" }}>
-          RenovaHome
-        </h1>
-        <p style={{ color: "#666", marginBottom: "30px" }}>Masuk ke akun Anda</p>
+  <div
+    style={{
+      display: "flex",
+      height: "100vh",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "linear-gradient(135deg, #6fb1fc, #4364f7, #0052d4)",
+      padding: "20px",
+    }}
+  >
+    <div
+      style={{
+        width: "380px",
+        padding: "35px",
+        background: "white",
+        borderRadius: "16px",
+        boxShadow: "0 12px 25px rgba(0,0,0,0.15)",
+        textAlign: "center",
+        animation: "fadeIn 0.5s ease",
+      }}
+    >
+      <h1 style={{ fontSize: "30px", fontWeight: "700", color: "#1a3cff" }}>
+        RenovaHome
+      </h1>
+      <p style={{ color: "#666", marginBottom: "25px" }}>
+        Masuk ke akun kamu
+      </p>
 
-        {error && (
-          <p style={{ color: "red", fontSize: "14px", marginBottom: "10px" }}>
-            {error}
-          </p>
-        )}
+      {error && (
+        <p style={{ color: "red", marginBottom: "10px", fontSize: "14px" }}>
+          {error}
+        </p>
+      )}
 
-        <label>Email</label>
+      {/* INPUT */}
+      <div style={{ textAlign: "left", width: "100%" }}>
+        <label style={{ fontWeight: "600", fontSize: "14px" }}>Email</label>
         <input
           type="email"
-          placeholder="Masukkan email kamu"
+          placeholder="Masukkan email"
           style={{
-            width: "80%",
-            padding: "10px",
+            width: "100%",
+            padding: "12px",
+            marginTop: "6px",
             marginBottom: "15px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
+            borderRadius: "10px",
+            border: "1px solid #d0d0d0",
+            background: "#fafafa",
+            fontSize: "14px",
           }}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label>Password</label>
+        <label style={{ fontWeight: "600", fontSize: "14px" }}>Password</label>
         <input
           type="password"
           placeholder="Masukkan password"
           style={{
-            width: "80%",
-            padding: "10px",
-            marginBottom: "15px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
+            width: "100%",
+            padding: "12px",
+            marginTop: "6px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "1px solid #d0d0d0",
+            background: "#fafafa",
+            fontSize: "14px",
           }}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+      </div>
 
-        <button
-          style={{
-            width: "80%",
-            padding: "10px",
-            backgroundColor: hover ? "#003f82" : "#0056b3",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "0.3s",
-          }}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onClick={handleLogin}
-        >
-          Masuk
-        </button>
+      {/* BUTTON */}
+      <button
+        style={{
+          width: "100%",
+          padding: "12px",
+          background: hover
+            ? "linear-gradient(135deg, #3957ff, #0038c9)"
+            : "linear-gradient(135deg, #4d6bff, #1a3cff)",
+          color: "white",
+          border: "none",
+          borderRadius: "10px",
+          fontWeight: "700",
+          fontSize: "15px",
+          cursor: "pointer",
+          transition: "0.3s",
+        }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onClick={handleLogin}
+      >
+        Masuk
+      </button>
 
-        <p style={{ marginTop: "20px", fontSize: "14px" }}>
+      {/* LINK */}
+      <div style={{ marginTop: "20px", fontSize: "14px" }}>
+        <p>
           Belum punya akun?{" "}
           <span
-            style={{ color: "#0056b3", cursor: "pointer", fontWeight: "600" }}
             onClick={() => navigate("/Registrasi")}
+            style={{ color: "#1a3cff", cursor: "pointer", fontWeight: "600" }}
           >
-            Daftar di sini
+            Daftar
           </span>
         </p>
 
-        <p style={{ marginTop: "10px", fontSize: "14px" }}>
-          Daftar sebagai admin?{" "}
+        <p style={{ marginTop: "5px" }}>
+          Admin?{" "}
           <span
-            style={{ color: "#0056b3", cursor: "pointer", fontWeight: "600" }}
             onClick={() => navigate("/RegistrasiAdmin")}
+            style={{ color: "#1a3cff", cursor: "pointer", fontWeight: "600" }}
           >
             Daftar Admin
           </span>
         </p>
 
-        <p style={{ marginTop: "10px", fontSize: "14px" }}>
-          Daftar sebagai arsitek?{" "}
+        <p style={{ marginTop: "5px" }}>
+          Arsitek?{" "}
           <span
-            style={{ color: "#0056b3", cursor: "pointer", fontWeight: "600" }}
             onClick={() => navigate("/RegistrasiArsitek")}
+            style={{ color: "#1a3cff", cursor: "pointer", fontWeight: "600" }}
           >
             Daftar Arsitek
           </span>
         </p>
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Login;

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Plus, X, Search, Download, Eye, Filter, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LaporanProject = () => {
   const [reports, setReports] = useState([
@@ -173,8 +174,11 @@ const LaporanProject = () => {
     return matchesSearch && matchesFilter;
   });
 
+
+  const navigate = useNavigate();
+
   const handleNavigation = (path) => {
-    alert(`Navigasi ke: ${path}`);
+    navigate(path);
   };
 
   return (
@@ -186,29 +190,29 @@ const LaporanProject = () => {
         </div>
         <nav style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/admin/dashboard')}
+            onClick={() => handleNavigation('/arsitek/dashboard')}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/admin/projectKerjaan')}
+            onClick={() => handleNavigation('/arsitek/projectKerjaan')}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Project Kerjaan</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', backgroundColor: '#7C3AED', borderRadius: '8px', color: 'white', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)' }}>
-            <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Laporan Project</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Daftar Projek</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/admin/jadwalKerja')}
+            onClick={() => handleNavigation('/arsitek/jadwalKerjaA')}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
+          </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', backgroundColor: '#7C3AED', borderRadius: '8px', color: 'white', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)' }}>
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Laporan Project</span>
           </div>
         </nav>
         <div style={{ padding: '16px', borderTop: '1px solid #1A1D35', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -292,55 +296,78 @@ const LaporanProject = () => {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ textAlign: 'left', fontSize: '12px', color: '#6B7280', borderBottom: '1px solid #1A1D35', backgroundColor: '#0B0D1A' }}>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Nama Project</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Tanggal</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Progress</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Mandor</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Status</th>
-                      <th style={{ padding: '12px 24px', fontWeight: '500' }}>Actions</th>
+                      <th style={{ padding: '12px 24px', fontWeight: 600 }}>Nama Project</th>
+                      <th style={{ padding: '12px 24px', fontWeight: 600 }}>Tanggal</th>
+                      <th style={{ padding: '12px 24px', fontWeight: 600 }}>Progress</th>
+                      <th style={{ padding: '12px 24px', fontWeight: 600 }}>Mandor</th>
+                      <th style={{ padding: '12px 24px', fontWeight: 600 }}>Status</th>
+                      <th style={{ padding: '12px 24px', fontWeight: 600 }}>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredReports.map((report) => (
-                      <tr key={report.id} style={{ borderBottom: '1px solid #1A1D35' }}>
-                        <td style={{ padding: '16px 24px', fontSize: '14px', color: 'white', fontWeight: '500' }}>{report.nama_project}</td>
-                        <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>{report.tanggal_laporan}</td>
-                        <td style={{ padding: '16px 24px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ flex: 1, height: '8px', backgroundColor: '#1A1D35', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div style={{ width: `${report.progress}%`, height: '100%', backgroundColor: getProgressColor(report.progress), transition: 'width 0.3s' }}></div>
-                            </div>
-                            <span style={{ fontSize: '12px', color: getProgressColor(report.progress), fontWeight: '600', minWidth: '40px' }}>{report.progress}%</span>
+                    {filteredReports.map((r) => (
+                      <tr key={r.id} style={{ borderBottom: "1px solid #1A1D35" }}>
+                        <td style={{ padding: "16px 24px", color: "white" }}>{r.nama_project}</td>
+
+                        <td style={{ padding: "16px 24px", color: "#9CA3AF" }}>
+                          {r.tanggal_laporan}
+                        </td>
+
+                        <td style={{ padding: "16px 24px" }}>
+                          <div
+                            style={{
+                              height: "8px",
+                              backgroundColor: "#1A1D35",
+                              borderRadius: "4px",
+                              width: "100px",
+                              position: "relative",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${r.progress}%`,
+                                height: "8px",
+                                backgroundColor: getProgressColor(r.progress),
+                                borderRadius: "4px",
+                              }}
+                            ></div>
                           </div>
                         </td>
-                        <td style={{ padding: '16px 24px', fontSize: '12px', color: '#9CA3AF' }}>{report.mandor}</td>
-                        <td style={{ padding: '16px 24px' }}>
-                          <span style={{
-                            padding: '4px 12px',
-                            borderRadius: '20px',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            textTransform: 'uppercase',
-                            ...getStatusBadge(report.status)
-                          }}>
-                            {report.status === "onprogress" ? "On Progress" : report.status}
+
+                        <td style={{ padding: "16px 24px", color: "#9CA3AF" }}>{r.mandor}</td>
+
+                        <td style={{ padding: "16px 24px" }}>
+                          <span
+                            style={{
+                              padding: "4px 10px",
+                              borderRadius: "6px",
+                              fontSize: "12px",
+                              ...getStatusBadge(r.status),
+                            }}
+                          >
+                            {r.status}
                           </span>
                         </td>
-                        <td style={{ padding: '16px 24px' }}>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button onClick={() => openDetailModal(report)} style={{ padding: '6px 10px', backgroundColor: 'rgba(124, 58, 237, 0.1)', border: '1px solid rgba(124, 58, 237, 0.3)', borderRadius: '6px', color: '#C4B5FD', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Eye size={14} />
-                            </button>
-                            <button onClick={() => handleExport(report)} style={{ padding: '6px 10px', backgroundColor: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '6px', color: '#86EFAC', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Download size={14} />
-                            </button>
-                            <button onClick={() => openEditModal(report)} style={{ padding: '6px 12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '6px', color: '#93C5FD', fontSize: '12px', cursor: 'pointer', fontWeight: '500' }}>
-                              Edit
-                            </button>
-                            <button onClick={() => handleDelete(report.id)} style={{ padding: '6px 12px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', color: '#FCA5A5', fontSize: '12px', cursor: 'pointer', fontWeight: '500' }}>
-                              Delete
-                            </button>
-                          </div>
+
+                        <td style={{ padding: "16px 24px", display: "flex", gap: "10px" }}>
+                          <Eye
+                            size={18}
+                            color="#93C5FD"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => openDetailModal(r)}
+                          />
+                          <Download
+                            size={18}
+                            color="#86EFAC"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleExport(r)}
+                          />
+                          <X
+                            size={18}
+                            color="#FCA5A5"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleDelete(r.id)}
+                          />
                         </td>
                       </tr>
                     ))}

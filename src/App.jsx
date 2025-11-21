@@ -11,7 +11,10 @@ import JanjiView from "./admin/janjiView.jsx";
 import DashboardMandor from "./mandor/DashboardMandor.jsx";
 import DashboardArsitek from "./arsitek/DashboardArsitek.jsx";
 import JadwalKerja from "./arsitek/jadwalKerjaA.jsx";
+import LaporanProject from "./arsitek/laporanProject.jsx";
 import DashboardUser from "./user/DashboardUser.jsx";
+
+
 
 function App() {
   return (
@@ -29,7 +32,8 @@ function App() {
       <Route path = "/admin/JanjiView" element={<JanjiView/>} />
       <Route path = "/mandor/dashboard" element={<DashboardMandor/>} />
       <Route path = "/arsitek/dashboard" element={<DashboardArsitek/>} /> 
-      <Route path = "/arsitek/jadwalKerja" element={<JadwalKerja/>} />
+      <Route path = "/arsitek/jadwalKerjaA" element={<JadwalKerja/>} />
+      <Route path = "/arsitek/laporanProject" element={<LaporanProject/>} />
     </Routes>
   );
 }

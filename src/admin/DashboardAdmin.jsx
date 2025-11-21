@@ -3,6 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { MoreHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
+
 const DashboardAdmin = () => {
   const [admin] = useState({
     Nama_Lengkap: "Roihan Galang",
@@ -180,9 +182,29 @@ const DashboardAdmin = () => {
               margin: 0
             }}>Admin account</p>
           </div>
+          <div
+                style={{
+                  marginTop: "12px",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "#EF4444",
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "0.3s"
+                }}
+                onClick={() => {
+                  localStorage.removeItem("user");
+                  navigate("/");
+                }}
+              >
+          Logout
+          </div>
         </div>
       </div>
 
+      
       {/* Main Content */}
       <div style={{ 
         flex: 1,

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 const JadwalKerja = () => {
 
-    const navigate = useNavigate();
   // Data dummy
   const [schedules, setSchedules] = useState([
     { id: 1, nama_program: "Renovasi Rumah Bpk. Ahmad", tanggal_mulai: "2025-11-10", tanggal_selesai: "2025-12-25", mandor: "Slamet Riyadi", status: "onprogress" },
@@ -109,8 +108,10 @@ const JadwalKerja = () => {
     s.mandor.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const navigate = useNavigate();
+
   const handleNavigation = (path) => {
-    alert(`Navigasi ke: ${path}`);
+    navigate(path);
   };
 
   return (
@@ -128,31 +129,34 @@ const JadwalKerja = () => {
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
-            onClick={() => handleNavigation('/arsitek/userManager')}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
+            onClick={() => navigate('/arsitek/projectKerjaan')}>
             <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>User Management</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Daftar Projek</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
+          {/* <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
             onClick={() => handleNavigation('/arsitek/orderManagement')}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Order Management</span>
-          </div>
+          </div> */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', backgroundColor: '#7C3AED', borderRadius: '8px', color: 'white', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)' }}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
+            onClick={() => navigate('/arsitek/laporanProject')}>
+            <span style={{ fontSize: '16px' }}>●</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Laporan Kerja</span>
+          </div>
+          {/* <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer', transition: 'all 0.2s' }}
             onClick={() => handleNavigation('/admin/janjiView')}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1A1D35'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Janji Konsultasi</span>
-          </div>
+          </div> */}
         </nav>
         <div style={{ padding: '16px', borderTop: '1px solid #1A1D35', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>RG</div>

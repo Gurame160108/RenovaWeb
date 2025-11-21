@@ -50,20 +50,20 @@ const DashboardArsitek = () => {
         <nav style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', backgroundColor: '#7C3AED', color: 'white', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)' }}>
             <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard Arsitek</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
-            onClick={() => navigate('/arsitek/project')}>
+            onClick={() => navigate('/arsitek/projectKerjaan')}>
             <span style={{ fontSize: '16px' }}>●</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Daftar Project</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Daftar Projek</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
-            onClick={() => navigate('/arsitek/jadwal')}>
+            onClick={() => navigate('/arsitek/jadwalKerjaA')}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Jadwal Kerja</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}
-            onClick={() => navigate('/arsitek/laporan')}>
+            onClick={() => navigate('/arsitek/laporanProject')}>
             <span style={{ fontSize: '16px' }}>●</span>
             <span style={{ fontSize: '14px', fontWeight: '500' }}>Laporan Kerja</span>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Search, Plus, Edit2, Trash2, Eye, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
 const OrderManagement = () => {
   const navigate = useNavigate(); // Navigasi antar halaman
 
@@ -264,6 +265,25 @@ const OrderManagement = () => {
           <div>
             <p style={{ fontSize: '14px', fontWeight: '600', color: 'white', margin: 0 }}>Roihan Galang</p>
             <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>Admin account</p>
+          </div>
+          <div
+                style={{
+                  marginTop: "12px",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  backgroundColor: "#EF4444",
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "0.3s"
+                }}
+                onClick={() => {
+                  localStorage.removeItem("user");
+                  navigate("/");
+                }}
+              >
+          Logout
           </div>
         </div>
       </div>
