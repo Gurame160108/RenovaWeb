@@ -1,180 +1,318 @@
-import React from "react";
-import { HardHat, MapPin, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  LayoutGrid,
+  Briefcase,
+  ClipboardList,
+  FileText,
+  Calendar,
+  History,
+  Bell,
+  User,
+  X
+} from "lucide-react";
 
 const ProyekMandor = () => {
   const navigate = useNavigate();
 
-  const daftarProyek = [
+  // Dummy proyek (sesuai ERD)
+  const dataProyek = [
     {
-      id: 201,
-      nama: "Renovasi Rumah Bpk. Ahmad",
-      lokasi: "Jakarta Selatan",
-      progress: 58,
-      deadline: "28 Des 2025",
-      status: "onprogress"
+      id_proyek: 1,
+      nama_proyek: "Renovasi Rumah Pak Ahmad",
+      user: "Ahmad Surya",
+      arsitek: "Rafi Gunawan",
+      status: "On Progress",
+      desain: "/img/desain1.jpg",
+      catatan: "Gunakan cat eksterior warna putih sesuai revisi.",
+      revisi: "Perubahan desain ruang tamu – layout diperbesar 1 meter."
     },
     {
-      id: 202,
-      nama: "Bangun Kos 3 Lantai",
-      lokasi: "Depok",
-      progress: 35,
-      deadline: "12 Jan 2026",
-      status: "onprogress"
+      id_proyek: 2,
+      nama_proyek: "Pembangunan Ruko Bu Siti",
+      user: "Siti Rahma",
+      arsitek: "Fahri Pratama",
+      status: "Pending",
+      desain: "/img/desain2.jpg",
+      catatan: "Tunggu konfirmasi revisi tahap ke-2.",
+      revisi: "Revisi atap – material diganti ke spandek."
     },
     {
-      id: 203,
-      nama: "Perbaikan Gedung Sekolah",
-      lokasi: "Tangerang",
-      progress: 92,
-      deadline: "20 Nov 2025",
-      status: "finishing"
-    },
+      id_proyek: 3,
+      nama_proyek: "Villa Batu Malang",
+      user: "Budi Santoso",
+      arsitek: "Ganang Permadi",
+      status: "Completed",
+      desain: "/img/desain3.jpg",
+      catatan: "Proyek selesai. Menunggu serah terima.",
+      revisi: "Tidak ada revisi."
+    }
   ];
 
-  const getStatusBadge = (status) => {
-    const map = {
-      onprogress: { bg: "rgba(59, 130, 246, 0.2)", color: "#93C5FD", border: "rgba(59, 130, 246, 0.3)" },
-      finishing: { bg: "rgba(251, 191, 36, 0.2)", color: "#FDE047", border: "rgba(251, 191, 36, 0.3)" },
-      completed: { bg: "rgba(34, 197, 94, 0.2)", color: "#86EFAC", border: "rgba(34, 197, 94, 0.3)" },
-    };
-    return map[status] || map.onprogress;
+  const [selected, setSelected] = useState(null);
+
+  const openDetail = (item) => {
+    setSelected(item);
+  };
+
+  const closeDetail = () => {
+    setSelected(null);
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#0B0D1A', color: '#F3F4F6', fontFamily: 'Inter, system-ui, sans-serif' }}>
-
-      {/* Sidebar */}
-      <div style={{ width: '256px', backgroundColor: '#12142A', borderRight: '1px solid #1A1D35', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid #1A1D35' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', margin: 0 }}>Renova</h1>
-        </div>
-
-        <nav style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <div onClick={() => navigate('/mandor/dashboard')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}>
-            <HardHat size={16} />
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Dashboard Mandor</span>
-          </div>
-
-          <div
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        backgroundColor: "#0F0F0F",
+        color: "white",
+        fontFamily: "Inter"
+      }}
+    >
+      {/* SIDEBAR */}
+      <div
+        style={{
+          width: "250px",
+          backgroundColor: "#1A1A1A",
+          borderRight: "1px solid #2A2A2A",
+          display: "flex",
+          flexDirection: "column"
+        }}
+      >
+        <div
+          style={{ padding: "20px", borderBottom: "1px solid #2A2A2A" }}
+        >
+          <h1
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              backgroundColor: '#7C3AED',
-              color: 'white',
-              cursor: 'pointer',
-              boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.3)',
-            }}>
-            <HardHat size={16} />
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Proyek Saya</span>
-          </div>
-
-          <div onClick={() => navigate('/mandor/tim')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}>
-            <span>👥</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Tim Pekerja</span>
-          </div>
-
-          <div onClick={() => navigate('/mandor/absensi')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', color: '#9CA3AF', cursor: 'pointer' }}>
-            <span>🗓️</span>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>Absensi & Laporan</span>
-          </div>
-        </nav>
-
-        <div style={{ padding: '16px', borderTop: '1px solid #1A1D35', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>
-            SR
-          </div>
-          <div>
-            <p style={{ fontSize: '14px', fontWeight: '600', color: 'white', margin: 0 }}>Slamet Riyadi</p>
-            <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>Mandor Lapangan</p>
-          </div>
+              margin: 0,
+              color: "#FF8A00",
+              fontSize: "26px",
+              fontWeight: "bold"
+            }}
+          >
+            Renova Mandor
+          </h1>
         </div>
+
+        <nav
+          style={{
+            padding: "10px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6
+          }}
+        >
+          <MenuItem
+            icon={<LayoutGrid size={18} />}
+            label="Dashboard"
+            onClick={() => navigate("/mandor/DashboardMandor")}
+          />
+
+          <MenuItem
+            icon={<Briefcase size={18} />}
+            label="Proyek Saya"
+            active
+            onClick={() => navigate("/mandor/ProyekMandor")}
+          />
+
+          <MenuItem
+            icon={<ClipboardList size={18} />}
+            label="Instruksi Arsitek"
+            onClick={() => navigate("/mandor/InstruksiMandor")}
+          />
+
+          <MenuItem
+            icon={<FileText size={18} />}
+            label="Laporan Harian"
+            onClick={() => navigate("/mandor/LaporanHarianMandor")}
+          />
+
+          <MenuItem
+            icon={<Calendar size={18} />}
+            label="Jadwal Kerja"
+            onClick={() => navigate("/mandor/JadwalKerjaMandor")}
+          />
+
+          <MenuItem
+            icon={<User size={18} />}
+            label="Profil"
+            onClick={() => navigate("/mandor/ProfilMandor")}
+          />
+        </nav>
       </div>
 
-      {/* Main */}
-      <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#0B0D1A' }}>
-        <header style={{ backgroundColor: '#12142A', padding: '20px 28px', borderBottom: '1px solid #1A1D35' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'white', margin: 0 }}>Proyek Saya</h2>
+      {/* MAIN CONTENT */}
+      <div style={{ flex: 1, overflowY: "auto" }}>
+        <header
+          style={{
+            padding: "20px",
+            borderBottom: "1px solid #222",
+            backgroundColor: "#1A1A1A"
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 600 }}>
+            Proyek Saya
+          </h2>
         </header>
 
-        <main style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {daftarProyek.map((p) => {
-              const badge = getStatusBadge(p.status);
-
-              return (
-                <div key={p.id}
-                  style={{
-                    backgroundColor: '#12142A',
-                    borderRadius: '14px',
-                    border: '1px solid #1A1D35',
-                    padding: '20px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                  
-                  <div>
-                    <p style={{ fontSize: '16px', color: 'white', fontWeight: '600', marginBottom: '4px' }}>{p.nama}</p>
-                    <p style={{ fontSize: '13px', color: '#9CA3AF', margin: '2px 0' }}>
-                      <MapPin size={14} style={{ marginRight: '6px' }} />
-                      {p.lokasi}
-                    </p>
-
-                    {/* Progress bar */}
-                    <div style={{ marginTop: '10px', width: '200px' }}>
-                      <div style={{ width: '100%', height: '7px', backgroundColor: '#1A1D35', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: `${p.progress}%`, height: '100%', backgroundColor: '#7C3AED' }} />
-                      </div>
-                      <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '4px' }}>{p.progress}%</p>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                    <span style={{
-                      padding: '4px 10px',
-                      borderRadius: '20px',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      backgroundColor: badge.bg,
-                      color: badge.color,
-                      border: `1px solid ${badge.border}`
-                    }}>
-                      {p.status === "finishing" ? "Finishing" : "On Progress"}
-                    </span>
-
-                    <button
-                      onClick={() => navigate(`/mandor/proyek/${p.id}`)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#7C3AED',
-                        fontSize: '13px'
-                      }}>
-                      Detail Proyek <ChevronRight size={14} />
-                    </button>
-                  </div>
-
-                </div>
-              );
-            })}
+        <main style={{ padding: 20 }}>
+          <div
+            style={{
+              backgroundColor: "#1A1A1A",
+              padding: 20,
+              borderRadius: 10,
+              border: "1px solid #2A2A2A"
+            }}
+          >
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ color: "#FF8A00", textAlign: "left" }}>
+                  <th style={{ padding: 12 }}>ID</th>
+                  <th style={{ padding: 12 }}>Proyek</th>
+                  <th style={{ padding: 12 }}>Klien</th>
+                  <th style={{ padding: 12 }}>Arsitek</th>
+                  <th style={{ padding: 12 }}>Status</th>
+                  <th style={{ padding: 12 }}>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataProyek.map((item) => (
+                  <tr key={item.id_proyek} style={{ borderBottom: "1px solid #2A2A2A" }}>
+                    <td style={{ padding: 12 }}>{item.id_proyek}</td>
+                    <td style={{ padding: 12 }}>{item.nama_proyek}</td>
+                    <td style={{ padding: 12 }}>{item.user}</td>
+                    <td style={{ padding: 12 }}>{item.arsitek}</td>
+                    <td style={{ padding: 12 }}>{item.status}</td>
+                    <td style={{ padding: 12 }}>
+                      <button
+                        onClick={() => openDetail(item)}
+                        style={{
+                          padding: "6px 14px",
+                          backgroundColor: "#FF8A00",
+                          border: "none",
+                          borderRadius: 6,
+                          cursor: "pointer",
+                          color: "black",
+                          fontWeight: 600
+                        }}
+                      >
+                        Detail
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-
         </main>
       </div>
+
+      {/* POPUP DETAIL PROYEK */}
+      {selected && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 20
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#1A1A1A",
+              width: "600px",
+              borderRadius: 10,
+              border: "1px solid #2A2A2A"
+            }}
+          >
+            <div
+              style={{
+                padding: "20px",
+                borderBottom: "1px solid #2A2A2A",
+                display: "flex",
+                justifyContent: "space-between"
+              }}
+            >
+              <h3 style={{ margin: 0 }}>Detail Proyek</h3>
+              <button
+                onClick={closeDetail}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#999"
+                }}
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div style={{ padding: 20 }}>
+
+              <p><strong>Nama Proyek:</strong> {selected.nama_proyek}</p>
+              <p><strong>Klien:</strong> {selected.user}</p>
+              <p><strong>Arsitek:</strong> {selected.arsitek}</p>
+              <p><strong>Status:</strong> {selected.status}</p>
+
+              <hr style={{ borderColor: "#2A2A2A", margin: "16px 0" }} />
+
+              <p style={{ color: "#FF8A00", fontWeight: 600 }}>Desain Final:</p>
+              <div
+                style={{
+                  width: "100%",
+                  height: "180px",
+                  backgroundColor: "#333",
+                  borderRadius: 8,
+                  marginBottom: 15,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  color: "#777"
+                }}
+              >
+                (Preview Gambar Dummy)
+              </div>
+
+              <p><strong>Catatan Arsitek:</strong> {selected.catatan}</p>
+
+              <p><strong>Revisi Terakhir:</strong> {selected.revisi}</p>
+
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const MenuItem = ({ icon, label, active, onClick }) => (
+  <div
+    onClick={onClick}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "10px 12px",
+      borderRadius: 8,
+      cursor: "pointer",
+      backgroundColor: active ? "#FF8A00" : "transparent",
+      color: active ? "black" : "#ccc",
+      fontWeight: active ? 600 : 500,
+      transition: "0.2s"
+    }}
+    onMouseEnter={(e) =>
+      !active && (e.currentTarget.style.backgroundColor = "#2A2A2A")
+    }
+    onMouseLeave={(e) =>
+      !active && (e.currentTarget.style.backgroundColor = "transparent")
+    }
+  >
+    {icon}
+    <span>{label}</span>
+  </div>
+);
 
 export default ProyekMandor;
